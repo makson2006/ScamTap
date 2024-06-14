@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/profile.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+       $(document).ready(function() {
+    function addPoints() {
+        $.ajax({
+            type: 'POST',
+            url: '{% url "add_points" %}',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                $('#points').text(response.points);
+            },
+            error: function(response) {
+                console.log('Error:', response);
+            }
+        });
+    }
+
+    {% if miner_purchased %}
+        setInterval(addPoints, 1000);
+    {% endif %}
+
+    $('#earn-points').click(function(e) {
+        e.preventDefault();
+        {% if miner_purchased %}
+            addPoints();
+        {% else %}
+            alert('Ви маєте купити майнер, щоб отримувати монети.');
+        {% endif %}
+    });
+
+    $('#buy-miner').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '{% url "buy_miner" %}',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                $('#points').text(response.points);
+                alert('Майнер успішно куплений!');
+                location.reload();
+            },
+            error: function(response) {
+                alert(response.responseJSON.error);
+            }
+        });
+    });
+});
+    </script>
+</head>
+<body>
+    <div class="profile-info">
+        <h2>Профіль</h2>
+        <p>Ім'я: {{ username }}</p>
+        <p>Монет: <span id="points">{{ points }}</span></p>
+        {% if not miner_purchased %}
+            <form id="buy-miner-form">
+                <button id="buy-miner">Buy Miner (4000 points)</button>
+            </form>
+        {% else %}
+            <p>Ви вже купили майнер.</p>
+        {% endif %}
+    </div>
+    <button onclick="window.location.href='{% url 'home' %}'">Go to Home</button>
+</body>
+</html>

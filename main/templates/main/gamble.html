@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gamble Your Points</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/main.css' %}">
+</head>
+<body>
+    <h1>Gamble Your Points</h1>
+    <p>Your Points: {{ points }}</p>  <!-- Відображення кількості поінтів -->
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Gamble</button>
+    </form>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
