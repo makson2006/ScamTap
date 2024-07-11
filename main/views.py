@@ -10,7 +10,6 @@ from .models import Profile
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from .tasks import add_point_every_second
 from .forms import GambleForm
 
 
@@ -67,7 +66,6 @@ def buy_miner(request):
             profile.miners = 1
             profile.save()
             # Запланувати завдання для додавання балів кожну секунду
-            add_point_every_second.apply_async(args=[profile.user.id], countdown=1)
             return JsonResponse({'points': profile.points, 'miners': profile.miners})
         else:
             return JsonResponse({'error': 'Недостатньо монет'}, status=400)
